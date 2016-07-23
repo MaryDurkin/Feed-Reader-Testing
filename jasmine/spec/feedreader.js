@@ -51,7 +51,6 @@ $(function() {
 
     /* This suite tests the menu */
     describe('The menu', function(){
-        var position = $('.slide-menu').position();
 
         /*
          * This tests that the menu is initially hidden
@@ -86,47 +85,53 @@ $(function() {
     });
 
     /* This tests that there is at least one feed present after loadFeed has completes */
+    /* Thanks to my previous reviewer for helping me select the correct DOM element */
     describe('Initial Entries', function(){
 
         beforeEach(function(done){
-            loadFeed(0, function(){
-            done();
-            });
+            loadFeed(0, done);
         });
 
-        it('There is at least one .entry element',function(done){
-            expect($('.entry h2')[0]).toBeDefined();
-            done();
+        it('There is at least one .entry element',function(){
+
+            expect($('.feed .entry').length).toBeGreaterThan(0);
+
         });
 
     });
 
-    /* This test checks that when a new feed is loaded, the contant changes */
+    /* This test checks that when a new feed is loaded, the content changes */
+    /* Thanks to my previous reviewer and also to the following forum post for  */
+    /* helping me understand and implement this correctly
+    /* https://discussions.udacity.com/t/last-test-suit-new-feed-selection-not-working/26375/5 */
     describe('New Feed Selection', function(){
 
-        var newFeedIndex = allFeeds.length - 1;
-        /* beforeEach loads the last feed in the allFeeds array */
-        beforeEach(function(done) {
+      var firstFeed,
+          newFeed;
+      /* load initial feed */
+      beforeEach(function(done) {
 
-            loadFeed(newFeedIndex, function(){
-            done();
-            });
+        loadFeed(0, function(){
+
+          firstFeed = $('.feed').find('h2').text();
+          done();
+
         });
-        /* if there is more than one feed in the array, test that a new one has loaded */
-        if (newFeedIndex >= 1) {
-            it('Content changes when new feed is loaded', function(done){
 
-                expect($('.header .header-title').html()).not.toBe(allFeeds[0].name);
-                done();
-            });
-        }
-        /* if there is only one feed, we can't test for new content - so say so */
-        else {
+      });
 
-            it('Only one feed, cannot test content changes', function(done){
-                expect($('.header .header-title').html()).toBe(allFeeds[0].name);
-                done();
-            });
-        }
+      it('Content changes when new feed is loaded', function(done){
+
+        loadFeed(1, function(){
+
+          newFeed = $('.feed').find('h2').text();
+          expect(firstFeed).not.toEqual(newFeed);
+          done();
+
+        });
+
+      });
+
     });
+
 }());
